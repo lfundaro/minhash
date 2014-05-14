@@ -1,16 +1,17 @@
-##REQUIREMENTS
+##Introduction 
+##Requirements
 
 * Sbt 0.13
 * Python (for creating datasets)
 * Java 1.7 or higher
 
-##EXTRA FOLDERS
+##Extra Folders
 
 * generator/: contains a python script (generator.py) to generate datasets.
 * input/: contains two sampleInputs ready to be used.
 * report/: contains the latex source for this project report.
 
-##HOW TO RUN
+##Build and Run
 
 * From a console, go to the project source folder and execute: 
 	$> sbt "run <path to input> <number of hash functions> <user to be recommended>"
