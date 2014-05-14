@@ -1,0 +1,151 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% LaTeX Example: Project Report
+%
+% Source: http://www.howtotex.com
+%
+% Feel free to distribute this example, but please keep the referral
+% to howtotex.com
+% Date: March 2011 
+% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% How to use writeLaTeX: 
+%
+% You edit the source code here on the left, and the preview on the
+% right shows you the result within a few seconds.
+%
+% Bookmark this page and share the URL with your co-authors. They can
+% edit at the same time!
+%
+% You can upload figures, bibliographies, custom classes and
+% styles using the files menu.
+%
+% If you're new to LaTeX, the wikibook is a great place to start:
+% http://en.wikibooks.org/wiki/LaTeX
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Edit the title below to update the display in My Documents
+%\title{Project Report}
+%
+%%% Preamble
+\documentclass[paper=a4, fontsize=11pt]{scrartcl}
+\usepackage[T1]{fontenc}
+\usepackage{fourier}
+\usepackage{hyperref}
+
+\usepackage[english]{babel}															% English language/hyphenation
+\usepackage[protrusion=true,expansion=true]{microtype}	
+\usepackage{amsmath,amsfonts,amsthm} % Math packages
+\usepackage[pdftex]{graphicx}	
+\usepackage{url}
+
+
+%%% Custom sectioning
+\usepackage{sectsty}
+\allsectionsfont{\centering \normalfont\scshape}
+
+
+%%% Custom headers/footers (fancyhdr package)
+\usepackage{fancyhdr}
+\pagestyle{fancyplain}
+\fancyhead{}											% No page header
+\fancyfoot[L]{}											% Empty 
+\fancyfoot[C]{}											% Empty
+\fancyfoot[R]{\thepage}									% Pagenumbering
+\renewcommand{\headrulewidth}{0pt}			% Remove header underlines
+\renewcommand{\footrulewidth}{0pt}				% Remove footer underlines
+\setlength{\headheight}{13.6pt}
+
+
+%%% Equation and float numbering
+\numberwithin{equation}{section}		% Equationnumbering: section.eq#
+\numberwithin{figure}{section}			% Figurenumbering: section.fig#
+\numberwithin{table}{section}				% Tablenumbering: section.tab#
+
+
+%%% Maketitle metadata
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}} 	% Horizontal rule
+
+\title{
+		%\vspace{-1in} 	
+		\usefont{OT1}{bch}{b}{n}
+		\normalfont \normalsize \textsc{Dawanda Challenge} \\ [25pt]
+		\horrule{0.5pt} \\[0.4cm]
+		\huge Recommendation Engine using MinHash \\
+		\horrule{2pt} \\[0.5cm]
+}
+\author{
+		\normalfont 								\normalsize
+        Lorenzo Fundaro\\[-3pt]		\normalsize
+        \today
+}
+\date{}
+
+
+%%% Begin document
+\begin{document}
+\maketitle
+
+\section{Problem Modeling}
+\subsection{Data Structures}
+\paragraph{}
+The problem of finding similarity between sets can be tackled using a technique called MinHash. For that purpose, it is common 
+to model all the sets and the elements they have in a \textit{characteristic matrix} shown as follows:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+      & $S_1$ & $S_2$ & ... & $S_n$ \\ \hline
+$e_1$ & 1     & 0     & 0   & 1     \\ \hline
+$e_2$ & 0     & 0     & 1   & 1     \\ \hline
+...   &       &       &     &       \\ \hline
+$e_n$   & 1     & 0     & 1   & 1     \\ \hline
+\end{tabular}
+\end{table}
+
+where ($e_i$,$S_i$) = 1 if $S_i$ contains the element $e_i$ and ($e_i$,$S_i$) = 0 otherwise. This matrix is naturally very \textit{sparse}, so for 
+this particular implementation I decided to use a map where the keys represent a \textit{productId} and the correspondent value is a list of integers containing several 
+\textit{userId}'s. This decision would allow for easier traversal when calculating the signature matrix that MinHash requires to build.
+
+\subsection{Hashing Functions}
+
+For the set of hashing functions I created a class called \textit{Hash} under the package \textit{utils}.
+This class is useful for generating a list of functions that are applied to every element of the \textit{signature matrix}. The following 
+function is used for hashing:
+
+\begin{align} 
+	h &= (a_i*x + b_i) \bmod 2147483647					
+\end{align}
+
+where ${a_i,b_i}$ are coefficients generated randomly and the large number is a prime number. 
+
+
+\section{Problems encountered during development}
+
+\begin{itemize}
+\item \textbf{Complex traversal on data structure:} when applying the MinHash algorithm one has to make calculations with the signature matrix. 
+For this calculations, it is necessary to traverse the list of products and for each product grab the list of users that have bought it and 
+for each user hash its column in the signature matrix and save the changes for the next traversal. In functional programming side effects
+are not allowed, but in this case, to make things easier I decided to make the signature matrix a variable and not a value. 
+\item \textbf{Hash function:} in order to get recommendations, the amount of hashing functions should be between 4 and 10, any number 
+beyond that range would not allow for any hash collisions, thus giving no output. I still don't understand very well why I cannot use, e.g.: 100 functions. 
+Choosing the right hashing function is still an open question for me. 
+\end{itemize}
+
+\section{Possible Improvements}
+
+Once we have calculated the signature matrix we can proceed on the suggestion of products for a given user. This calculation involves 
+comparing the signature column of the user with the rest of the users and obtaining the similarity index. The majority of these calculations 
+don't throw any results and a lot of CPU time is wasted for bigger datasets. By using a technique called Locality Sensitive Hashing (LSH) we can 
+reduce the candidate sets considering only those signatures columns that when compared will give a positive result.
+
+\section{Resources}
+
+\begin{itemize}
+\item Mining of Massive Datasets by Jure Leskovec, Anand Rajaraman and Jeff Ullman.
+\item Google News Personalization: Scalable Online Collaborative Filtering.
+\item \href{http://www.tonicebrian.com/2013/03/11/introduction-to-the-minhash-algorithm/}{Introduction to the MinHash algorithm}
+\end{itemize}
+
+%%% End document
+\end{document}
