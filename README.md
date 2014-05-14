@@ -18,9 +18,13 @@ how similar two sets are.
 ##Build and Run
 
 * From a console, go to the project source folder and execute: 
+```
 	$> sbt "run <path to input> <number of hash functions> <user to be recommended>"
+```
   For example:
+```
     $> sbt "run input/sampleInput2.txt 4 2" 
+```
 
    The output should give a List[(userId,SimIndex)] in descending order and 
    a list of products to be recommended.
