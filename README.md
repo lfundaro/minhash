@@ -1,4 +1,8 @@
 ##Introduction 
+
+This is a prototype implementation of the MinHash technique for quickly estimating 
+how similar two sets are. 
+
 ##Requirements
 
 * Sbt 0.13
